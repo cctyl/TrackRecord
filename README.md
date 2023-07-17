@@ -16,6 +16,7 @@
 
 # 前言
 [项目地址](https://github.com/cctyl/TrackRecord) 
+[演示视频](https://www.bilibili.com/video/BV1tu411L7qW)
 
 一款记录你走过的位置的软件，只要将软件启动，放在后台。那么软件会每间隔半小时获取一次当前的位置
 然后上传到服务器当中。用户在web端直接打开浏览器查看指定时间范围内的轨迹。
