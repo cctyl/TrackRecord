@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- import CSS -->
+    <link rel="stylesheet" href="./css/ele.css">
+
+    <!-- import Vue before Element -->
+    <script src="./js/vue.js"></script>
+
+    <!-- import JavaScript -->
+    <script src="./js/ele.js"></script>
+    <script src="./js/axios.js"></script>
+
+    <!--腾讯地图-->
+    <!--引入Javascript API GL，参数说明参见下文-->
+    <script src="https://map.qq.com/api/gljs?v=1.exp&key=你的腾讯地图apikey"></script>
+
+
+</head>
+<body>
+<div id="app">
+    <!--   定义地图显示容器   -->
+    <div id="container"></div>
+
+    <!--悬浮于顶部的模态框-->
+    <div class="model">
+
+        <el-date-picker
+                v-model="timeRange"
+                type="datetimerange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                @change="changeTime"
+        >
+        </el-date-picker>
+        <button class="btn" @click="startMove">点击开始移动</button>
+    </div>
+
+
+</div>
+</body>
+
+<script>
+
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                //日期范围
+                timeRange: [],
+
+                startTimeMill: 0,
+                endTimeMill: 0,
+
+                //腾讯地图对象
+                tcMap: {},
+                //地图的marker管理对象
+                markerLayer: {},
+                //经纬度数组，存储的是TMap.LatLng对象
+                path: [],
+                //道路折线对象
+                polylineLayer: {},
+                //汽车、人 起点终点等标记
+                marker: {},
+                base_url: 'http://你的后端地址',
+                accessToken:"你的后端访问token"
+            }
+        },
+        mounted() {
+            this.initMap()
+
+        },
+        methods: {
+            /**
+             * 初始化地图
+             */
+            initMap() {
+
+                //0.定义地图中心点坐标
+                let center = new TMap.LatLng(39.98481500648338, 116.30571126937866)
+
+                //1.定义map变量，调用 TMap.Map() 构造函数创建地图
+                let map = new TMap.Map(document.getElementById('container'), {
+                    center: center,//设置地图中心点坐标
+                    zoom: 18,   //设置地图缩放级别
+                    viewMode: '2D',
+                    baseMap: {  // 设置卫星地图
+                        type: 'vector',
+                    },
+                    mapStyleId: 'style3',
+                    showControl: false,
+                    scale: 1
+                });
+                //存储地图对象
+                this.tcMap = map
+
+
+                //创建折线对象
+                this.polylineLayer = new TMap.MultiPolyline({
+                    map, // 绘制到目标地图
+                    // 折线样式定义
+                    styles: {
+                        style_blue: new TMap.PolylineStyle({
+                            color: '#3777FF', // 线填充色
+                            width: 4, // 折线宽度
+                            borderWidth: 2, // 边线宽度
+                            borderColor: '#FFF', // 边线颜色
+                            lineCap: 'round', // 线端头方式
+                            eraseColor: 'rgba(190,188,188,1)',
+                        }),
+                    },
+                });
+
+
+                this.marker = new TMap.MultiMarker({
+                    map,
+                    styles: {
+                        'car-down': new TMap.MarkerStyle({
+                            width: 40,
+                            height: 40,
+                            anchor: {
+                                x: 20,
+                                y: 20,
+                            },
+                            faceTo: 'map',
+                            rotate: 180,
+                            src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/car.png',
+                        }),
+                        start: new TMap.MarkerStyle({
+                            width: 25,
+                            height: 35,
+                            anchor: {x: 16, y: 32},
+                            src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/start.png',
+                        }),
+                        end: new TMap.MarkerStyle({
+                            width: 25,
+                            height: 35,
+                            anchor: {x: 16, y: 32},
+                            src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/end.png',
+                        }),
+                    },
+                });
+            },
+
+            /**
+             * 开始移动
+             * 先获取到数据，然后调用移动方法
+             */
+            async startMove() {
+
+                if (this.startTimeMill ===0 || this.endTimeMill ===0){
+                    console.log("未选择日期")
+                    this.$message({
+                        message: '未选择日期',
+                        type: 'warning'
+                    });
+                    return []
+                }
+
+                let result = await this.getGpsList()
+                let gpsData = result.data
+                if (!gpsData || gpsData.length<2){
+                    console.log("无数据");
+                    this.$message({
+                        message: '无数据',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                let array = this.gpsToLatLng(gpsData)
+                console.log(array)
+                this.carMove(array)
+            },
+
+            /**
+             * gps 数据转换 TMap.LatLng
+             */
+            gpsToLatLng(gpsData) {
+                let array = []
+                for (let i = 0; i < gpsData.length; i++) {
+                    array.push(
+                        new TMap.LatLng(gpsData[i].latitude, gpsData[i].longitude),
+                    )
+                }
+                return array
+            },
+
+            /**
+             * 汽车开始移动
+             */
+            carMove(path) {
+                console.log("移动")
+
+                //获取起点和终点
+                let start = path[0]
+                let end = path[path.length - 1]
+
+                //将视角移动到起点
+                this.tcMap.panTo(start)
+
+                let polylineLayer = this.polylineLayer;
+                polylineLayer.setGeometries([
+                    {
+                        id: 'erasePath',
+                        styleId: 'style_blue',
+                        paths: path,
+                    }
+                ])
+
+
+                let marker = this.marker;
+                marker.setGeometries([
+                    {
+                        id: 'car',
+                        styleId: 'car-down',
+                        position: start,
+                    },
+                    {
+                        id: 'start',
+                        styleId: 'start',
+                        position: start,
+                    },
+                    {
+                        id: 'end',
+                        styleId: 'end',
+                        position: end,
+                    },
+                ])
+
+                // 使用marker 移动接口
+                marker.moveAlong(
+                    {
+                        car: {
+                            path: path,
+                            speed: 800,
+                        },
+                    },
+                    {
+                        autoRotation: true,
+                    }
+                );
+                marker.on('moving', (e) => {
+                    var passedLatLngs = e.car && e.car.passedLatLngs;
+                    if (passedLatLngs) {
+                        // 使用路线擦除接口 eraseTo, https://lbs.qq.com/webApi/javascriptGL/glDoc/glDocVector
+                        polylineLayer.eraseTo(
+                            'erasePath',
+                            passedLatLngs.length - 1,
+                            passedLatLngs[passedLatLngs.length - 1]
+                        );
+                    }
+                });
+
+            },
+
+
+            /**
+             * 简单的对axios进行封装
+             * @param url
+             * @param data
+             * @param type
+             * @returns {Promise<unknown>}
+             */
+            ajax(url, data = {}, type = "GET") {
+                let burl = this.base_url
+                return new Promise(function (resolve, reject) {
+                    axios({
+                        method: type,
+                        url: url,
+                        baseURL: burl,
+                        data: data,
+                        withCredentials: true,
+                        headers: {'token': accessToken},
+                    }).then(response => {
+                        resolve(response.data)
+                    }).catch(reason => {
+                        console.log("Error: ")
+                        console.log(reason)
+                        reject(reason)
+                    })
+                })
+            },
+
+            /**
+             * 获取gps数据
+             */
+            getGpsList() {
+
+                console.log("start:"+this.startTimeMill+" end:"+this.endTimeMill)
+
+
+                return this.ajax(`/map/list?startTime=${this.startTimeMill}&endTime=${this.endTimeMill}`)
+            },
+
+
+            /**
+             * 修改日期的回调
+             */
+            changeTime() {
+                let timeRange = this.timeRange
+                this.startTimeMill = timeRange[0] * 1
+                this.endTimeMill = timeRange[1] * 1
+            },
+        }
+    })
+</script>
+<style>
+
+    html, body {
+        width: 100%;
+        height: 100%;
+    }
+
+    #app {
+        width: 100%;
+        height: 100%;
+    }
+
+    /*定义地图的大小*/
+    #container {
+        width: 100%;
+        height: 100%;
+    }
+
+    .model {
+        z-index: 2000;
+        position: absolute;
+        left: 2%;
+        top: 20%;
+        background: gray;
+        opacity: 0.5;
+
+    }
+</style>
+</html>
