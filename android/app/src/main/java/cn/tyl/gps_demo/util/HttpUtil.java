@@ -12,9 +12,11 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import cn.tyl.gps_demo.GPSApplication;
 import cn.tyl.gps_demo.entity.GPSData;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -27,7 +29,7 @@ import okhttp3.Response;
 public class HttpUtil {
 
 
-    private static final String URL = "http://你的后端地址";
+    private static final String URL = "你的后端地址:7093";
 
     private static Gson gson = new Gson();
     private static MediaType mediaType = MediaType.parse("application/json; charset=utf-8");//"类型,字节码"
@@ -49,7 +51,7 @@ public class HttpUtil {
         //3.创建Request对象，设置URL地址，将RequestBody作为post方法的参数传入
         Request request = new Request.Builder()
                 .url(URL + api)
-                .header("token", "你的后端token")
+                .header("token", "你的token")
                 .method(methodName,requestBody)
                 .build();
         //4.创建一个call对象,参数就是Request请求对象
@@ -68,11 +70,15 @@ public class HttpUtil {
         createRequest("/gps/add",data,"POST",new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+
+
+                GPSApplication.respStr = "onFailure: " + e.toString();
                 XLog.d("onFailure: " + e.toString());
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                XLog.d("响应为: " + response.body().string());
+                GPSApplication.respStr =response.body().string();
+                XLog.d("响应为: " +  GPSApplication.respStr );
             }
         });
     }
@@ -81,17 +87,20 @@ public class HttpUtil {
      * 上传多条gps数据
      * @param data
      */
-    public static void uploadMany(Set<GPSData> data) {
+    public static void uploadMany(Collection<GPSData> data) {
 
-        XLog.d("uploadMany:"+data);
+        XLog.d("uploadMany:");
         createRequest("/gps/addMany",data,"POST",new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 XLog.d("onFailure: " + e.toString());
+                GPSApplication.respStr = "onFailure: " + e.toString();
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                XLog.d("响应为: " + response.body().string());
+
+                GPSApplication.respStr =response.body().string();
+                XLog.d("响应为: " +  GPSApplication.respStr );
             }
         });
     }

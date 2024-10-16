@@ -15,6 +15,11 @@ android {
             enabled = true
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -30,6 +35,8 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.room:room-runtime:2.2.5'
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
     implementation "androidx.work:work-runtime:2.7.1"
     implementation 'com.amap.api:location:latest.integration'
     implementation 'com.elvishew:xlog:1.10.1'

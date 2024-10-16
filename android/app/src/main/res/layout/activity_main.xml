@@ -4,59 +4,222 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="model"
             type="cn.tyl.gps_demo.viewmodel.MainViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:context=".activity.MainActivity">
+        android:layout_height="wrap_content"
 
-        <TextView
-            android:id="@+id/readCountTv"
-            android:layout_width="wrap_content"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:text="1"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/closeBtn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.629" />
+            android:orientation="vertical"
+            android:padding="3dp">
 
-        <Button
-            android:id="@+id/closeBtn"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:text="最新地址："
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="经度：" />
+
+                <TextView
+                    android:id="@+id/tv_longitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="00.00" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="纬度：" />
+
+                <TextView
+                    android:id="@+id/tv_latitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="00.00" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="剩余未发送数据：" />
+
+                <TextView
+                    android:id="@+id/tv_last_data_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="3条" />
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="上次发送时间：" />
+
+                <TextView
+                    android:id="@+id/tv_last_send_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="1970-01-01" />
+
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="上次成功定位时间：" />
+
+                <TextView
+                    android:id="@+id/tv_last_gps_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="1970-01-01" />
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="发送响应：" />
+
+                <EditText
+                    android:id="@+id/et_resp_json"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine"
+                    android:lines="5"
+                    android:text="{status:200}"
+                    />
+
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:text="close"
-            app:layout_constraintStart_toStartOf="@+id/openBtn"
-            app:layout_constraintTop_toBottomOf="@+id/openBtn" />
+            android:layout_alignParentBottom="true"
+            android:gravity="left"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/openBtn"
-            android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/closeBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="close" />
+
+            <Button
+                android:id="@+id/openBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="open" />
+
+            <Button
+                android:id="@+id/testBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test" />
+
+
+            <Button
+                android:id="@+id/locationBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="location" />
+            <Button
+                android:id="@+id/sendBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sendData" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="109dp"
-            android:text="open"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_alignParentBottom="true"
+            android:gravity="right"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/testBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="test"
-            app:layout_constraintBottom_toTopOf="@+id/readCountTv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/closeBtn" />
+            <Button
+                android:id="@+id/insertData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="insertData" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/delData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="delData" />
+
+
+            <Button
+                android:id="@+id/findAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="findAll" />
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
 </layout>

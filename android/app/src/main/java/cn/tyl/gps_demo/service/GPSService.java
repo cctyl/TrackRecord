@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Build;
@@ -29,6 +30,7 @@ import java.net.URL;
 
 import cn.tyl.gps_demo.R;
 import cn.tyl.gps_demo.activity.MainActivity;
+import cn.tyl.gps_demo.receiver.ScreenStatusReceiver;
 
 public class GPSService extends Service {
     private static final String TAG = "GPSService";
@@ -37,16 +39,30 @@ public class GPSService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+
+        registSreenStatusReceiver();
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
 
+        notification(intent);
+
+
+        return new InnerBinder();
+    }
+
+    private void notification(Intent intent) {
         XLog.d( "onBind: 绑定服务");
         String ID = "cn.tyl.gps_demo";	//这里的id里面输入自己的项目的包的路径
         String NAME = "LEFTBAR";
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder notification; //创建服务对象
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(ID, NAME, manager.IMPORTANCE_HIGH);
+            NotificationChannel channel = new NotificationChannel(ID, NAME, NotificationManager.IMPORTANCE_HIGH);
             channel.enableLights(true);
             channel.setShowBadge(true);
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -64,9 +80,6 @@ public class GPSService extends Service {
                 .build();
         Notification notification1 = notification.build();
         startForeground(1,notification1);
-
-
-        return new InnerBinder();
     }
 
 
@@ -80,7 +93,7 @@ public class GPSService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         XLog.d("onStartCommand 启动服务");
-
+        notification(intent);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -102,6 +115,22 @@ public class GPSService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mScreenStatusReceiver!=null){
+            Log.d(TAG, "onDestroy: 取消广播监听");
+            unregisterReceiver(mScreenStatusReceiver);
+        }
         XLog.d( "onDestroy: 服务被销毁");
     }
+
+    private ScreenStatusReceiver mScreenStatusReceiver;
+    private void registSreenStatusReceiver() {
+        Log.d(TAG, "registSreenStatusReceiver: 注册服务");
+        mScreenStatusReceiver = new ScreenStatusReceiver();
+        IntentFilter screenStatusIF = new IntentFilter();
+        screenStatusIF.addAction(Intent.ACTION_SCREEN_ON);
+        screenStatusIF.addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(mScreenStatusReceiver, screenStatusIF);
+    }
+
+
 }

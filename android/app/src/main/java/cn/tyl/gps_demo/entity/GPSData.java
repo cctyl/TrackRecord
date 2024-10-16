@@ -2,12 +2,19 @@ package cn.tyl.gps_demo.entity;
 
 import android.os.Build;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import cn.tyl.gps_demo.util.DeviceUtils;
 
+@Entity(tableName = "gps_data")
 public class GPSData {
 
 
     @Override
+    @Ignore
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -19,62 +26,52 @@ public class GPSData {
     }
 
     @Override
+    @Ignore
     public int hashCode() {
         int result = longitude.hashCode();
         result = 31 * result + latitude.hashCode();
         return result;
     }
 
+
+    //表示主键自增
+    @PrimaryKey(autoGenerate = true)
+    public Integer id;
+
     //经度
-    private Double longitude;
+
+    public Double longitude;
 
     //纬度
-    private Double latitude;
+    public Double latitude;
 
     //机型
-    private String model;
+    public String model;
 
 
     //定位时间
-    private long time;
+    public long time;
 
-
-    public long getTime() {
-        return time;
+    public GPSData() {
     }
 
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
+    @Ignore
     public GPSData(Double longitude, Double latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
         this.model = DeviceUtils.getPhoneDetail();
         this.time = System.currentTimeMillis();
+    }
+
+    @Override
+    @Ignore
+    public String toString() {
+        return "GPSData{" +
+                "id=" + id +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", model='" + model + '\'' +
+                ", time=" + time +
+                '}';
     }
 }

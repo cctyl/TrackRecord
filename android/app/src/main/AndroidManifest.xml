@@ -5,56 +5,47 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage"
-       />
-    <!--允许获取设备和运营商信息，用于问题排查和网络定位（无gps情况下的定位），若需网络定位功能则必选-->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <!--允许获取网络状态，用于网络定位（无gps情况下的定位），若需网络定位功能则必选-->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!--允许获取wifi网络信息，用于网络定位（无gps情况下的定位），若需网络定位功能则必选-->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
-    <!--允许获取wifi状态改变，用于网络定位（无gps情况下的定位），若需网络定位功能则必选-->
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-
-    <!--后台获取位置信息，若需后台定位则必选-->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
-    <!--用于申请调用A-GPS模块,卫星定位加速-->
+        tools:ignore="ScopedStorage" /> <!-- 允许获取设备和运营商信息，用于问题排查和网络定位（无gps情况下的定位），若需网络定位功能则必选 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 允许获取网络状态，用于网络定位（无gps情况下的定位），若需网络定位功能则必选 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- 允许获取wifi网络信息，用于网络定位（无gps情况下的定位），若需网络定位功能则必选 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- 允许获取wifi状态改变，用于网络定位（无gps情况下的定位），若需网络定位功能则必选 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" /> <!-- 后台获取位置信息，若需后台定位则必选 -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> <!-- 用于申请调用A-GPS模块,卫星定位加速 -->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
 
-
-
     <application
-        android:requestLegacyExternalStorage="true"
-        android:name="GPSApplication"
+        android:name=".GPSApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Gps_demo">
-        <meta-data android:name="ScopedStorage" android:value="true" />
+        android:theme="@style/Theme.Gps_demo"
+        android:usesCleartextTraffic="true">
+        <receiver
+            android:name=".receiver.ScreenStatusReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
 
-        <meta-data android:name="com.amap.api.v2.apikey" android:value="xxxxx">
-        </meta-data>
-
+        <meta-data
+            android:name="ScopedStorage"
+            android:value="true" />
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="xxx"></meta-data>
 
         <service
             android:name=".service.GPSService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+        <service android:name="com.amap.api.location.APSService" />
 
-        <service android:name="com.amap.api.location.APSService"></service>
         <activity
             android:name=".activity.MainActivity"
             android:exported="true">
