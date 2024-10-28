@@ -72,10 +72,7 @@ POST /gps/addMany
 -	web	vue+腾讯地图
 
 	为了安全起见，web端可以放到本地电脑上。当然也可以直接发布到线上，已经做了允许跨域
--	android XXPermission+高德地图SDK+XLog+okhttp
-	
-	这里注意，android端写的特别的烂，只是勉强实现了保活和获取定位发送定位等功能，不值得学习。
-	等待后续重构
+-	android XXPermission + 高德地图SDK + XLog + okhttp + WorkManager + RoomDatabase + DataBind
 
 
     
